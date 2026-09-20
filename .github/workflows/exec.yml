@@ -1,0 +1,32 @@
+name: vanusta-exec
+run-name: vanusta ${{ inputs.run_id }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_id:
+        description: "ID da execução (letras, números e hífen)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Executar
+        env:
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          case "$RUN_ID" in *[!a-zA-Z0-9-]*|"") echo "run_id inválido"; exit 2;; esac
+          cd "runs/$RUN_ID"
+          timeout 300 bash run.sh
