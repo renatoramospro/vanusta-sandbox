@@ -1,0 +1,55 @@
+import unittest
+from extractor import CacheDocExtractor
+
+class TestCacheDocExtractor(unittest.TestCase):
+    def test_advanced_scenarios(self):
+        source = """
+        # Comentário que deve ser ignorado
+        CACHE_TTL = 15 * 60
+        EXPR_TTL = 3600
+    
+        def process_cache(r):
+            user_key = f"user:{id}:profile"
+            r.setex(user_key, CACHE_TTL, "data")
+    
+            r.set("product:123:details", "info", ex=EXPR_TTL)
+            r.expire("sessiontokenabc", 1800)
+            r.delete("user:100:profile")
+    
+            url = "http://example.com/api/v1"
+            msg = "Error: cache failed"
+        """
+        extractor = CacheDocExtractor()
+        extractor.parse_source_code(source)
+    
+        md = extractor.generate_markdown()
+
+        self.assertIn("user:{id}:profile", extractor.cache_patterns)
+        self.assertIn("product:123:details", extractor.cache_patterns)
+        self.assertIn("sessiontokenabc", extractor.cache_patterns)
+        
+        self.assertEqual(extractor.ttls.get("user:{id}:profile"), 900)
+        self.assertEqual(extractor.ttls.get("product:123:details"), 3600)
+        self.assertEqual(extractor.ttls.get("sessiontokenabc"), 1800)
+        
+        self.assertNotIn("http://example.com/api/v1", extractor.cache_patterns)
+        self.assertIn("# Relatório Automatizado", md)
+
+    def test_redis_conf_parsing(self):
+        config = """
+        maxmemory-policy volatile-lru
+        save 900 1
+        """
+        extractor = CacheDocExtractor()
+        extractor.parse_config(config)
+        self.assertEqual(len(extractor.invalidation_rules), 2)
+        self.assertEqual(extractor.invalidation_rules[0]["target"], "volatile-lru")
+
+    def test_empty_source(self):
+        extractor = CacheDocExtractor()
+        extractor.parse_source_code("")
+        md = extractor.generate_markdown()
+        self.assertIn("_Nenhum padrão estático de chave detectado._", md)
+
+if __name__ == '__main__':
+    unittest.main()
