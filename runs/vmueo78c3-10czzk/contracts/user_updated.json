@@ -1,0 +1,25 @@
+{
+  "event_name": "user.updated",
+  "description": "Disparado quando os dados de um usuário são modificados.",
+  "payload_schema": {
+    "type": "object",
+    "properties": {
+      "event_id": {"type": "string"},
+      "timestamp": {"type": "string"},
+      "data": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "changes": {"type": "array"}
+        },
+        "required": ["user_id", "changes"]
+      }
+    },
+    "required": ["event_id", "timestamp", "data"]
+  },
+  "retry_policy": {
+    "max_attempts": 4,
+    "backoff_factor": 2.0,
+    "initial_interval_seconds": 5
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "event_name": "user.created",
+  "description": "Disparado quando um novo usuário se registra na plataforma.",
+  "payload_schema": {
+    "type": "object",
+    "properties": {
+      "event_id": {"type": "string"},
+      "timestamp": {"type": "string"},
+      "data": {
+        "type": "object",
+        "properties": {
+          "user_id": {"type": "integer"},
+          "email": {"type": "string"}
+        },
+        "required": ["user_id", "email"]
+      }
+    },
+    "required": ["event_id", "timestamp", "data"]
+  },
+  "retry_policy": {
+    "max_attempts": 5,
+    "backoff_factor": 2.0,
+    "initial_interval_seconds": 10
+  }
+}

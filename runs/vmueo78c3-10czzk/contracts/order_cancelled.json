@@ -1,0 +1,25 @@
+{
+  "event_name": "order.cancelled",
+  "description": "Disparado quando um pedido é cancelado pelo cliente ou sistema.",
+  "payload_schema": {
+    "type": "object",
+    "properties": {
+      "event_id": {"type": "string"},
+      "timestamp": {"type": "string"},
+      "data": {
+        "type": "object",
+        "properties": {
+          "order_id": {"type": "string"},
+          "reason": {"type": "string"}
+        },
+        "required": ["order_id", "reason"]
+      }
+    },
+    "required": ["event_id", "timestamp", "data"]
+  },
+  "retry_policy": {
+    "max_attempts": 3,
+    "backoff_factor": 2.0,
+    "initial_interval_seconds": 5
+  }
+}

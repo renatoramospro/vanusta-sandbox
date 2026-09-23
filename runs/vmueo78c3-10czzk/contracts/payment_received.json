@@ -1,0 +1,25 @@
+{
+  "event_name": "payment.received",
+  "description": "Disparado quando a confirmação de pagamento é processada.",
+  "payload_schema": {
+    "type": "object",
+    "properties": {
+      "event_id": {"type": "string"},
+      "timestamp": {"type": "string"},
+      "data": {
+        "type": "object",
+        "properties": {
+          "payment_id": {"type": "string"},
+          "status": {"type": "string"}
+        },
+        "required": ["payment_id", "status"]
+      }
+    },
+    "required": ["event_id", "timestamp", "data"]
+  },
+  "retry_policy": {
+    "max_attempts": 5,
+    "backoff_factor": 2.0,
+    "initial_interval_seconds": 10
+  }
+}

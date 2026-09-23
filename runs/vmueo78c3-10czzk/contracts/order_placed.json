@@ -1,0 +1,25 @@
+{
+  "event_name": "order.placed",
+  "description": "Disparado quando um pedido é concluído com sucesso.",
+  "payload_schema": {
+    "type": "object",
+    "properties": {
+      "event_id": {"type": "string"},
+      "timestamp": {"type": "string"},
+      "data": {
+        "type": "object",
+        "properties": {
+          "order_id": {"type": "string"},
+          "total_amount": {"type": "number"}
+        },
+        "required": ["order_id", "total_amount"]
+      }
+    },
+    "required": ["event_id", "timestamp", "data"]
+  },
+  "retry_policy": {
+    "max_attempts": 5,
+    "backoff_factor": 3.0,
+    "initial_interval_seconds": 15
+  }
+}
